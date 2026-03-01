@@ -1,0 +1,12 @@
+[package]
+name = "school-backend"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.102"
+serde = { version = "1.0.228", features = ["derive"] }
+sqlx = { version = "0.8.6", features = ["postgres", "runtime-tokio-rustls", "macros"] }
+tower = "0.5.3"
+tower-http = { version = "0.6.8", features = ["cors", "trace"] }
+tracing-subscriber = "0.3.22"
