@@ -5,12 +5,16 @@ mod routes;
 mod services;
 mod utils;
 
+#[cfg(test)]
+mod tests;
+
 use axum::{
     http::StatusCode,
     response::IntoResponse,
     routing::get,
     Json, Router,
     middleware,
+    extract::Request,
 };
 use serde_json::json;
 use sqlx::postgres::PgPoolOptions;
@@ -48,8 +52,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // JWT configuration
     let jwt_config = JwtConfig::from_env();
+    let jwt_config_for_middleware = jwt_config.clone();
 
-    // Build router
+    // Build protected routes with state
     let protected_routes = Router::new()
         // Admin routes (protected)
         .route("/admin/dashboard", get(AdminController::get_dashboard))
@@ -82,17 +87,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/mentor/messages/student/:student_id", axum::routing::post(MentorController::message_student))
         .route("/mentor/courses/:course_id/assignments", get(MentorController::get_course_assignments))
         
-        // Apply authentication middleware only to protected routes
-        .layer(middleware::from_fn(move |req, next| {
-            let jwt_config = jwt_config.clone();
+        // Apply authentication middleware to protected routes
+        .layer(middleware::from_fn(move |req: Request, next| {
+            let jwt_config = jwt_config_for_middleware.clone();
             async move {
                 let mut req = req;
                 req.extensions_mut().insert(jwt_config);
                 auth_middleware(req, next).await
             }
         }))
-        .with_state((pool.clone(), jwt_config.clone()));
+        .with_state(pool.clone());
 
+    // Build main router
     let app = Router::new()
         // Health check endpoint (public)
         .route("/health", get(health_check))
@@ -100,13 +106,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Authentication routes (public)
         .nest("/auth", auth_routes(pool.clone(), jwt_config.clone()))
         
-        // Protected routes
+        // Merge protected routes
         .merge(protected_routes)
         
         // CORS layer
-        .layer(CorsLayer::permissive())
-        
-        .with_state((pool, jwt_config));
+        .layer(CorsLayer::permissive());
 
     // Start server
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await?;

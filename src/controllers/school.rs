@@ -18,7 +18,7 @@ impl SchoolController {
     /// Requires: Admin role
     pub async fn get_all_schools(
         admin: AdminUser,
-        State(pool): State<PgPool>,
+        State(_pool): State<PgPool>,
     ) -> Result<impl IntoResponse, AuthError> {
         let response = json!({
             "admin_id": admin.user_id,

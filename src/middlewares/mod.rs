@@ -1,7 +1,8 @@
 pub mod auth_middleware;
-pub mod role_guard;
 pub mod extractors;
 
+#[cfg(test)]
+mod tests;
+
 pub use auth_middleware::*;
-pub use role_guard::*;
 pub use extractors::*;

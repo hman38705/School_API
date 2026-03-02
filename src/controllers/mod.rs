@@ -4,6 +4,9 @@ pub mod student;
 pub mod mentor;
 pub mod school;
 
+#[cfg(test)]
+mod tests;
+
 pub use auth::*;
 pub use admin::*;
 pub use student::*;
