@@ -65,6 +65,7 @@ pub struct ApplicationResponse {
     pub created_at: DateTime<Utc>,
 }
 
+
 impl From<Application> for ApplicationResponse {
     fn from(a: Application) -> Self {
         ApplicationResponse {
@@ -83,3 +84,5 @@ impl From<Application> for ApplicationResponse {
         }
     }
 }
+
+

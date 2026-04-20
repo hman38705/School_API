@@ -51,6 +51,7 @@ sudo -u postgres psql -d school_db -f migrations/001_init.sql
 ### 4. Configure Environment
 
 The `.env` file is already configured with:
+
 ```
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/school_db
 ```
@@ -68,6 +69,7 @@ cargo run
 The server will start on `http://localhost:3000`
 
 You should see output like:
+
 ```
 INFO school_backend: Database migrations completed successfully
 INFO school_backend: Server running on http://127.0.0.1:3000
@@ -86,9 +88,10 @@ cargo build --release
 
 Once the server is running, access the interactive API documentation at:
 
-**http://localhost:3000/docs**
+**http://localhost:3000/swagger-ui/**
 
 The Swagger UI provides:
+
 - Complete API endpoint documentation
 - Interactive "Try it out" functionality
 - Request/response schemas with examples
@@ -104,11 +107,13 @@ The raw OpenAPI 3.0 specification is available at:
 ## API Endpoints
 
 ### Health Check
+
 - `GET /health` - Check API health status
 
 ### Authentication
 
 **Public Endpoints:**
+
 - `POST /auth/admin/register` - Register new admin user
 - `POST /auth/admin/login` - Admin login
 - `POST /auth/student/register` - Register new student user
@@ -118,11 +123,13 @@ The raw OpenAPI 3.0 specification is available at:
 - `POST /auth/refresh` - Refresh access token
 
 **Protected Endpoints:**
+
 - `POST /auth/logout` - Logout (requires authentication)
 - `GET /auth/me` - Get current user profile
 - `POST /auth/verify` - Verify token validity
 
 ### Admin Operations (Requires Admin Role)
+
 - `GET /admin/dashboard` - Get admin dashboard
 - `GET /admin/users` - List all users
 - `GET /admin/statistics` - Get user statistics
@@ -130,6 +137,7 @@ The raw OpenAPI 3.0 specification is available at:
 - `POST /admin/users/{user_id}/deactivate` - Deactivate user account
 
 ### School Management (Requires Admin Role)
+
 - `GET /admin/schools` - List all schools
 - `POST /admin/schools/create` - Create new school
 - `GET /admin/schools/{school_id}` - Get school details
@@ -138,6 +146,7 @@ The raw OpenAPI 3.0 specification is available at:
 - `GET /admin/schools/{school_id}/statistics` - Get school statistics
 
 ### Student Operations (Requires Student Role)
+
 - `GET /student/dashboard` - Get student dashboard
 - `GET /student/profile` - Get student profile
 - `GET /student/courses` - Get enrolled courses
@@ -146,6 +155,7 @@ The raw OpenAPI 3.0 specification is available at:
 - `POST /student/messages/mentor` - Send message to mentor
 
 ### Mentor Operations (Requires Mentor Role)
+
 - `GET /mentor/dashboard` - Get mentor dashboard
 - `GET /mentor/profile` - Get mentor profile
 - `GET /mentor/students` - Get assigned students
@@ -162,6 +172,7 @@ The API uses JWT (JSON Web Tokens) for authentication.
 ### Getting a Token
 
 1. Register or login using the appropriate endpoint:
+
 ```bash
 curl -X POST http://localhost:3000/auth/admin/login \
   -H "Content-Type: application/json" \
@@ -169,6 +180,7 @@ curl -X POST http://localhost:3000/auth/admin/login \
 ```
 
 2. The response will include an `access_token`:
+
 ```json
 {
   "user": {...},
@@ -198,6 +210,7 @@ curl -X GET http://localhost:3000/admin/dashboard \
 ## Database Schema
 
 ### Users Table
+
 - `id` - UUID primary key
 - `email` - VARCHAR, required, unique
 - `password_hash` - VARCHAR, required
@@ -209,18 +222,21 @@ curl -X GET http://localhost:3000/admin/dashboard \
 - `updated_at` - TIMESTAMP
 
 ### Schools Table (Placeholder)
+
 - `id` - UUID primary key
 - `name` - VARCHAR, required
 - `location` - VARCHAR
 - `principal` - VARCHAR
 
 ### Students Table (Placeholder)
+
 - `id` - UUID primary key
 - `user_id` - Foreign key to users table
 - `school_id` - Foreign key to schools table
 - `enrollment_date` - VARCHAR
 
 ### Mentors Table (Placeholder)
+
 - `id` - UUID primary key
 - `user_id` - Foreign key to users table
 - `school_id` - Foreign key to schools table
@@ -239,6 +255,7 @@ All error responses follow a standardized format:
 ```
 
 Common HTTP status codes:
+
 - `200 OK` - Successful GET, PUT, DELETE
 - `201 Created` - Successful POST
 - `400 Bad Request` - Invalid request data
@@ -253,6 +270,7 @@ Common HTTP status codes:
 ### Database Connection Issues
 
 If you see "password authentication failed", ensure:
+
 1. PostgreSQL is running: `sudo systemctl status postgresql`
 2. Password is set correctly: `sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'postgres';"`
 3. `.env` file has the correct DATABASE_URL
@@ -260,6 +278,7 @@ If you see "password authentication failed", ensure:
 ### Port Already in Use
 
 If port 3000 is already in use, you can change it in `src/main.rs`:
+
 ```rust
 let listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await?; // Change 3000 to your preferred port
 ```
@@ -267,7 +286,7 @@ let listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await?; // Change
 ### Swagger UI Not Loading
 
 1. Ensure the server is running on port 3000
-2. Navigate to `http://localhost:3000/docs` (not `/swagger`)
+2. Navigate to `http://localhost:3000/swagger-ui/`
 3. Check server logs for any errors
 4. Verify the OpenAPI spec is accessible at `http://localhost:3000/api-docs/openapi.json`
 
@@ -279,7 +298,7 @@ You may see false errors from rust-analyzer about "struct is not supported in tr
 
 - **API Documentation**: See [SWAGGER_INTEGRATION.md](SWAGGER_INTEGRATION.md) for detailed information about the Swagger/OpenAPI integration
 - **Authentication**: See [AUTH_DOCUMENTATION.md](AUTH_DOCUMENTATION.md) for authentication details
-- **Interactive API Docs**: http://localhost:3000/docs (when server is running)
+- **Interactive API Docs**: http://localhost:3000/swagger-ui/ (when server is running)
 
 ## Technology Stack
 

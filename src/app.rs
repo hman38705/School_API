@@ -71,15 +71,10 @@ pub fn build_app(pool: PgPool) -> Router {
         .merge(admin_protected)
         .merge(student_mentor_protected)
         // Swagger UI
-        .merge({
-            let mut openapi = ApiDoc::openapi();
-            let base_url = std::env::var("BASE_URL")
-                .unwrap_or_else(|_| "http://localhost:3000".to_string());
-            openapi.servers = Some(vec![
-                utoipa::openapi::ServerBuilder::new().url(base_url).build()
-            ]);
-            SwaggerUi::new("/docs").url("/api-docs/openapi.json", openapi)
-        })
+        .merge(
+            SwaggerUi::new("/swagger-ui")
+                .url("/api-docs/openapi.json", ApiDoc::openapi()),
+        )
         // CORS
         .layer(CorsLayer::permissive())
 }
