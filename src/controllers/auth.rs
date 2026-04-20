@@ -62,7 +62,7 @@ pub async fn login_user(
     })
 }
 
-/// Verify a refresh token and generate a new access token.
+/// Verify a refresh token and generate a new access token.6
 pub async fn refresh_access_token(
     pool: &PgPool,
     refresh_token_str: &str,
